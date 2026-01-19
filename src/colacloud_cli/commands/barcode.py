@@ -1,33 +1,12 @@
 """Barcode lookup command for COLA Cloud CLI."""
 
 import json
-import sys
 
 import click
-from rich.console import Console
 
-from colacloud_cli.api import APIError, AuthenticationError, RateLimitError, get_client
+from colacloud_cli.api import APIError, get_client
+from colacloud_cli.commands.utils import console, handle_api_error
 from colacloud_cli.formatters import format_barcode_result
-
-console = Console()
-
-
-def handle_api_error(e: APIError) -> None:
-    """Handle API errors with helpful messages."""
-    if isinstance(e, AuthenticationError):
-        console.print(f"[red]Authentication Error:[/] {e.message}")
-        console.print("\n[dim]Run 'cola config set-key' to configure your API key,[/]")
-        console.print("[dim]or set the COLACLOUD_API_KEY environment variable.[/]")
-    elif isinstance(e, RateLimitError):
-        console.print(f"[red]Rate Limit Exceeded:[/] {e.message}")
-        if e.retry_after:
-            console.print(f"[dim]Try again in {e.retry_after} seconds.[/]")
-        console.print("\n[dim]Run 'cola usage' to check your API usage.[/]")
-    else:
-        console.print(f"[red]API Error:[/] {e.message}")
-        if e.status_code:
-            console.print(f"[dim]Status code: {e.status_code}[/]")
-    sys.exit(1)
 
 
 @click.command(name="barcode")

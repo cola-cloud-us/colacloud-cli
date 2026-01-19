@@ -4,6 +4,7 @@ from typing import Any, Optional
 
 import httpx
 
+from colacloud_cli import __version__
 from colacloud_cli.config import get_config
 
 
@@ -83,7 +84,7 @@ class ColaCloudClient:
         """Get request headers including authentication."""
         headers = {
             "Accept": "application/json",
-            "User-Agent": "colacloud-cli/0.1.0",
+            "User-Agent": f"colacloud-cli/{__version__}",
         }
         if self.api_key:
             headers["X-API-Key"] = self.api_key
@@ -106,7 +107,7 @@ class ColaCloudClient:
         # Try to parse JSON response
         try:
             data = response.json()
-        except Exception:
+        except (ValueError, httpx.DecodingError):
             data = {}
 
         # Handle successful responses

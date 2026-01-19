@@ -14,7 +14,7 @@ pip install colacloud-cli
 uv pip install colacloud-cli
 
 # Or install from source
-git clone https://github.com/jaysobel/colacloud-cli.git
+git clone https://github.com/cola-cloud-us/colacloud-cli.git
 cd colacloud-cli
 uv sync
 ```
@@ -249,7 +249,7 @@ The CLI stores configuration in `~/.colacloud/config.json`. The file is created 
 
 ```bash
 # Clone the repository
-git clone https://github.com/jaysobel/colacloud-cli.git
+git clone https://github.com/cola-cloud-us/colacloud-cli.git
 cd colacloud-cli
 
 # Install dependencies
@@ -274,4 +274,4 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 - [COLA Cloud Website](https://colacloud.us)
 - [API Documentation](https://colacloud.us/docs/api)
-- [GitHub Repository](https://github.com/jaysobel/colacloud-cli)
+- [GitHub Repository](https://github.com/cola-cloud-us/colacloud-cli)

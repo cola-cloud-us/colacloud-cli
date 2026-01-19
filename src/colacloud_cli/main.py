@@ -22,9 +22,8 @@ class AliasedGroup(click.Group):
         if rv is not None:
             return rv
 
-        # Support common aliases
+        # Support common aliases for command groups
         aliases = {
-            "search": "colas",  # 'cola search' -> 'cola colas search'
             "s": "colas",
             "p": "permittees",
             "c": "config",
@@ -34,6 +33,13 @@ class AliasedGroup(click.Group):
 
         if cmd_name in aliases:
             return click.Group.get_command(self, ctx, aliases[cmd_name])
+
+        # Special case: 'cola search <query>' -> 'cola colas search <query>'
+        # This requires forwarding remaining args to the search subcommand
+        if cmd_name == "search":
+            colas_group = click.Group.get_command(self, ctx, "colas")
+            if colas_group:
+                return colas_group.get_command(ctx, "search")
 
         return None
 
