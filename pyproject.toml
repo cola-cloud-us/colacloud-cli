@@ -34,7 +34,7 @@ cola = "colacloud_cli.main:cli"
 [project.urls]
 Homepage = "https://colacloud.us"
 Documentation = "https://colacloud.us/docs/api"
-Repository = "https://github.com/jaysobel/colacloud-cli"
+Repository = "https://github.com/cola-cloud-us/colacloud-cli"
 
 [build-system]
 requires = ["hatchling"]
