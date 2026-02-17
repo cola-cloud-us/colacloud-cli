@@ -57,7 +57,12 @@ class TestColasCommands:
                             "approval_date": "2024-01-15",
                         }
                     ],
-                    "pagination": {"page": 1, "total": 1, "per_page": 20, "total_pages": 1},
+                    "pagination": {
+                        "page": 1,
+                        "total": 1,
+                        "per_page": 20,
+                        "total_pages": 1,
+                    },
                 },
             )
         )
@@ -262,13 +267,19 @@ class TestErrorHandling:
         respx.get("https://app.colacloud.us/api/v1/colas").mock(
             return_value=httpx.Response(
                 401,
-                json={"error": {"code": "invalid_api_key", "message": "Invalid API key"}},
+                json={
+                    "error": {"code": "invalid_api_key", "message": "Invalid API key"}
+                },
             )
         )
 
         result = runner.invoke(cli, ["colas", "list"])
         assert result.exit_code == 1  # Error exits with code 1
-        assert "Invalid" in result.output or "API key" in result.output or "Error" in result.output
+        assert (
+            "Invalid" in result.output
+            or "API key" in result.output
+            or "Error" in result.output
+        )
 
     @respx.mock
     def test_rate_limit_error_message(self, runner, api_key):
@@ -277,10 +288,16 @@ class TestErrorHandling:
             return_value=httpx.Response(
                 429,
                 headers={"Retry-After": "60"},
-                json={"error": {"code": "rate_limited", "message": "Rate limit exceeded"}},
+                json={
+                    "error": {"code": "rate_limited", "message": "Rate limit exceeded"}
+                },
             )
         )
 
         result = runner.invoke(cli, ["colas", "list"])
         assert result.exit_code == 1  # Error exits with code 1
-        assert "limit" in result.output.lower() or "rate" in result.output.lower() or "error" in result.output.lower()
+        assert (
+            "limit" in result.output.lower()
+            or "rate" in result.output.lower()
+            or "error" in result.output.lower()
+        )

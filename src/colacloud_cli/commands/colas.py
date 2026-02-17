@@ -23,16 +23,28 @@ def colas_group():
 @click.option("-q", "--query", help="Full-text search query.")
 @click.option(
     "--product-type",
-    type=click.Choice(["malt beverage", "wine", "distilled spirits"], case_sensitive=False),
+    type=click.Choice(
+        ["malt beverage", "wine", "distilled spirits"], case_sensitive=False
+    ),
     help="Filter by product type.",
 )
 @click.option("--origin", help="Filter by origin (country/state).")
 @click.option("--brand", "brand_name", help="Filter by brand name (partial match).")
-@click.option("--date-from", "approval_date_from", help="Filter by minimum approval date (YYYY-MM-DD).")
-@click.option("--date-to", "approval_date_to", help="Filter by maximum approval date (YYYY-MM-DD).")
+@click.option(
+    "--date-from",
+    "approval_date_from",
+    help="Filter by minimum approval date (YYYY-MM-DD).",
+)
+@click.option(
+    "--date-to",
+    "approval_date_to",
+    help="Filter by maximum approval date (YYYY-MM-DD).",
+)
 @click.option("--abv-min", type=float, help="Filter by minimum ABV.")
 @click.option("--abv-max", type=float, help="Filter by maximum ABV.")
-@click.option("--limit", "per_page", default=20, type=int, help="Results per page (max 100).")
+@click.option(
+    "--limit", "per_page", default=20, type=int, help="Results per page (max 100)."
+)
 @click.option("--page", default=1, type=int, help="Page number.")
 @click.option("--json", "as_json", is_flag=True, help="Output as JSON.")
 def list_colas(
@@ -135,7 +147,9 @@ def get_cola(ttb_id: str, as_json: bool):
 
 @colas_group.command(name="search")
 @click.argument("query")
-@click.option("--limit", "per_page", default=20, type=int, help="Results per page (max 100).")
+@click.option(
+    "--limit", "per_page", default=20, type=int, help="Results per page (max 100)."
+)
 @click.option("--page", default=1, type=int, help="Page number.")
 @click.option("--json", "as_json", is_flag=True, help="Output as JSON.")
 def search_colas(query: str, per_page: int, page: int, as_json: bool):

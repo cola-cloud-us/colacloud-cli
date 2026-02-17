@@ -1,6 +1,7 @@
 """COLA Cloud API client wrapper."""
 
-from typing import Any, Optional
+import contextlib
+from typing import Any
 
 import httpx
 
@@ -14,9 +15,9 @@ class APIError(Exception):
     def __init__(
         self,
         message: str,
-        status_code: Optional[int] = None,
-        error_code: Optional[str] = None,
-        details: Optional[dict] = None,
+        status_code: int | None = None,
+        error_code: str | None = None,
+        details: dict | None = None,
     ):
         super().__init__(message)
         self.message = message
@@ -45,7 +46,7 @@ class RateLimitError(APIError):
     def __init__(
         self,
         message: str,
-        retry_after: Optional[int] = None,
+        retry_after: int | None = None,
         **kwargs,
     ):
         super().__init__(message, **kwargs)
@@ -57,8 +58,8 @@ class ColaCloudClient:
 
     def __init__(
         self,
-        api_key: Optional[str] = None,
-        base_url: Optional[str] = None,
+        api_key: str | None = None,
+        base_url: str | None = None,
         timeout: float = 30.0,
     ):
         """Initialize the API client.
@@ -117,7 +118,9 @@ class ColaCloudClient:
         # Extract error information
         error_info = data.get("error", {})
         error_code = error_info.get("code", "unknown_error")
-        error_message = error_info.get("message", response.reason_phrase or "Unknown error")
+        error_message = error_info.get(
+            "message", response.reason_phrase or "Unknown error"
+        )
         error_details = error_info.get("details", {})
 
         # Handle specific error types
@@ -132,10 +135,8 @@ class ColaCloudClient:
         if response.status_code == 429:
             retry_after = None
             if "Retry-After" in response.headers:
-                try:
+                with contextlib.suppress(ValueError):
                     retry_after = int(response.headers["Retry-After"])
-                except ValueError:
-                    pass
 
             raise RateLimitError(
                 error_message,
@@ -160,8 +161,8 @@ class ColaCloudClient:
         """
         if not self.api_key:
             raise AuthenticationError(
-                "API key not configured. Run 'cola config set-key' to set your API key, "
-                "or set the COLACLOUD_API_KEY environment variable."
+                "API key not configured. Run 'cola config set-key' to set "
+                "your API key, or set the COLACLOUD_API_KEY environment variable."
             )
 
     def close(self) -> None:
@@ -178,14 +179,14 @@ class ColaCloudClient:
 
     def list_colas(
         self,
-        query: Optional[str] = None,
-        product_type: Optional[str] = None,
-        origin: Optional[str] = None,
-        brand_name: Optional[str] = None,
-        approval_date_from: Optional[str] = None,
-        approval_date_to: Optional[str] = None,
-        abv_min: Optional[float] = None,
-        abv_max: Optional[float] = None,
+        query: str | None = None,
+        product_type: str | None = None,
+        origin: str | None = None,
+        brand_name: str | None = None,
+        approval_date_from: str | None = None,
+        approval_date_to: str | None = None,
+        abv_min: float | None = None,
+        abv_max: float | None = None,
         page: int = 1,
         per_page: int = 20,
     ) -> dict[str, Any]:
@@ -193,7 +194,7 @@ class ColaCloudClient:
 
         Args:
             query: Full-text search query.
-            product_type: Filter by product type (malt beverage, wine, distilled spirits).
+            product_type: Filter by product type.
             origin: Filter by country/state.
             brand_name: Filter by brand name (partial match).
             approval_date_from: Filter by minimum approval date (YYYY-MM-DD).
@@ -248,9 +249,9 @@ class ColaCloudClient:
 
     def list_permittees(
         self,
-        query: Optional[str] = None,
-        state: Optional[str] = None,
-        is_active: Optional[bool] = None,
+        query: str | None = None,
+        state: str | None = None,
+        is_active: bool | None = None,
         page: int = 1,
         per_page: int = 20,
     ) -> dict[str, Any]:

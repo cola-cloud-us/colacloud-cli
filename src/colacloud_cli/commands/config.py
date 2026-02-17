@@ -49,7 +49,9 @@ def set_key(key: str | None):
     config.set_api_key(key)
 
     console.print("[green]Success![/] API key saved to ~/.colacloud/config.json")
-    console.print("[dim]The config file has been set to mode 600 (owner read/write only).[/]")
+    console.print(
+        "[dim]The config file has been set to mode 600 (owner read/write only).[/]"
+    )
 
 
 @config_group.command(name="show")

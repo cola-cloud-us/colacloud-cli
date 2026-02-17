@@ -95,10 +95,10 @@ def main() -> None:
         cli()
     except KeyboardInterrupt:
         console.print("\n[dim]Interrupted.[/]")
-        raise SystemExit(130)
+        raise SystemExit(130) from None
     except Exception as e:
         console.print(f"[red]Error:[/] {e}")
-        raise SystemExit(1)
+        raise SystemExit(1) from e
 
 
 if __name__ == "__main__":

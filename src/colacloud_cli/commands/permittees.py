@@ -23,7 +23,9 @@ def permittees_group():
 @click.option("-q", "--query", help="Search by company name (partial match).")
 @click.option("--state", help="Filter by state (e.g., CA, NY, TX).")
 @click.option("--active/--inactive", default=None, help="Filter by active status.")
-@click.option("--limit", "per_page", default=20, type=int, help="Results per page (max 100).")
+@click.option(
+    "--limit", "per_page", default=20, type=int, help="Results per page (max 100)."
+)
 @click.option("--page", default=1, type=int, help="Page number.")
 @click.option("--json", "as_json", is_flag=True, help="Output as JSON.")
 def list_permittees(

@@ -1,12 +1,10 @@
 """Tests for configuration management."""
 
-import json
 import os
-from pathlib import Path
 
 import pytest
 
-from colacloud_cli.config import Config, API_KEY_ENV_VAR
+from colacloud_cli.config import API_KEY_ENV_VAR, Config
 
 
 @pytest.fixture

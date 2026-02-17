@@ -194,7 +194,9 @@ class TestErrorHandling:
         respx.get("https://test.colacloud.us/api/v1/colas").mock(
             return_value=httpx.Response(
                 401,
-                json={"error": {"code": "invalid_api_key", "message": "Invalid API key"}},
+                json={
+                    "error": {"code": "invalid_api_key", "message": "Invalid API key"}
+                },
             )
         )
 
@@ -210,7 +212,9 @@ class TestErrorHandling:
             return_value=httpx.Response(
                 429,
                 headers={"Retry-After": "60"},
-                json={"error": {"code": "rate_limited", "message": "Too many requests"}},
+                json={
+                    "error": {"code": "rate_limited", "message": "Too many requests"}
+                },
             )
         )
 

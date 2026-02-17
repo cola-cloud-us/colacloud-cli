@@ -3,7 +3,6 @@
 import json
 import os
 from pathlib import Path
-from typing import Optional
 
 # Default configuration directory and file
 CONFIG_DIR = Path.home() / ".colacloud"
@@ -19,7 +18,7 @@ DEFAULT_API_BASE_URL = "https://app.colacloud.us/api/v1"
 class Config:
     """Manages CLI configuration including API key storage."""
 
-    def __init__(self, config_path: Optional[Path] = None):
+    def __init__(self, config_path: Path | None = None):
         """Initialize config manager.
 
         Args:
@@ -34,9 +33,9 @@ class Config:
         """Load configuration from file if it exists."""
         if self.config_path.exists():
             try:
-                with open(self.config_path, "r") as f:
+                with open(self.config_path) as f:
                     self._config = json.load(f)
-            except (json.JSONDecodeError, IOError):
+            except (OSError, json.JSONDecodeError):
                 self._config = {}
         else:
             self._config = {}
@@ -52,7 +51,7 @@ class Config:
         # Set restrictive permissions on config file (contains API key)
         os.chmod(self.config_path, 0o600)
 
-    def get_api_key(self) -> Optional[str]:
+    def get_api_key(self) -> str | None:
         """Get API key from environment variable or config file.
 
         Environment variable takes precedence over config file.
@@ -127,7 +126,7 @@ class Config:
 
 
 # Global config instance
-_config: Optional[Config] = None
+_config: Config | None = None
 
 
 def get_config() -> Config:

@@ -1,7 +1,7 @@
 """Rich table formatters for CLI output."""
 
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 from rich.console import Console
 from rich.panel import Panel
@@ -25,21 +25,21 @@ STATUS_COLORS = {
 }
 
 
-def get_product_type_color(product_type: Optional[str]) -> str:
+def get_product_type_color(product_type: str | None) -> str:
     """Get color for a product type."""
     if not product_type:
         return "white"
     return PRODUCT_TYPE_COLORS.get(product_type.lower(), "white")
 
 
-def get_status_color(status: Optional[str]) -> str:
+def get_status_color(status: str | None) -> str:
     """Get color for a status value."""
     if not status:
         return "white"
     return STATUS_COLORS.get(status.lower(), "white")
 
 
-def truncate(text: Optional[str], max_length: int = 30) -> str:
+def truncate(text: str | None, max_length: int = 30) -> str:
     """Truncate text to max length with ellipsis."""
     if not text:
         return ""
@@ -48,7 +48,7 @@ def truncate(text: Optional[str], max_length: int = 30) -> str:
     return text[: max_length - 3] + "..."
 
 
-def format_date(date_str: Optional[str]) -> str:
+def format_date(date_str: str | None) -> str:
     """Format ISO date string for display."""
     if not date_str:
         return ""
@@ -62,14 +62,14 @@ def format_date(date_str: Optional[str]) -> str:
         return date_str
 
 
-def format_number(num: Optional[int]) -> str:
+def format_number(num: int | None) -> str:
     """Format number with thousands separators."""
     if num is None:
         return ""
     return f"{num:,}"
 
 
-def format_percentage(value: Optional[float]) -> str:
+def format_percentage(value: float | None) -> str:
     """Format a percentage value."""
     if value is None:
         return ""
@@ -128,7 +128,13 @@ def format_cola_detail(cola: dict[str, Any], console: Console) -> None:
     header.append("\n")
     header.append(cola.get("product_name", ""), style="italic")
 
-    console.print(Panel(header, title=f"[bright_blue]{cola.get('ttb_id', '')}[/]", border_style="blue"))
+    console.print(
+        Panel(
+            header,
+            title=f"[bright_blue]{cola.get('ttb_id', '')}[/]",
+            border_style="blue",
+        )
+    )
 
     # Basic info table
     info_table = Table(show_header=False, box=None, padding=(0, 2))
@@ -159,7 +165,13 @@ def format_cola_detail(cola: dict[str, Any], console: Console) -> None:
     dates_table.add_row("Approval Date", format_date(cola.get("approval_date")))
     if cola.get("expiration_date"):
         dates_table.add_row("Expiration Date", format_date(cola.get("expiration_date")))
-    dates_table.add_row("Status", Text(cola.get("application_status", ""), style=get_status_color(cola.get("application_status"))))
+    dates_table.add_row(
+        "Status",
+        Text(
+            cola.get("application_status", ""),
+            style=get_status_color(cola.get("application_status")),
+        ),
+    )
 
     console.print()
     console.print("[bold]Dates & Status[/]")
@@ -343,9 +355,17 @@ def format_permittee_detail(permittee: dict[str, Any], console: Console) -> None
 
     # Header
     header = Text()
-    header.append(permittee.get("company_name", "Unknown Company"), style="bold bright_white")
+    header.append(
+        permittee.get("company_name", "Unknown Company"), style="bold bright_white"
+    )
 
-    console.print(Panel(header, title=f"[bright_blue]{permittee.get('permit_number', '')}[/]", border_style="blue"))
+    console.print(
+        Panel(
+            header,
+            title=f"[bright_blue]{permittee.get('permit_number', '')}[/]",
+            border_style="blue",
+        )
+    )
 
     # Basic info
     info_table = Table(show_header=False, box=None, padding=(0, 2))
@@ -369,9 +389,13 @@ def format_permittee_detail(permittee: dict[str, Any], console: Console) -> None
     stats_table.add_column("Value")
 
     stats_table.add_row("Total COLAs", format_number(permittee.get("colas")))
-    stats_table.add_row("Approved COLAs", format_number(permittee.get("colas_approved")))
+    stats_table.add_row(
+        "Approved COLAs", format_number(permittee.get("colas_approved"))
+    )
     if permittee.get("last_cola_application_date"):
-        stats_table.add_row("Last Application", format_date(permittee.get("last_cola_application_date")))
+        stats_table.add_row(
+            "Last Application", format_date(permittee.get("last_cola_application_date"))
+        )
 
     console.print()
     console.print("[bold]COLA Statistics[/]")
@@ -441,7 +465,10 @@ def format_usage(data: dict[str, Any], console: Console) -> None:
 
     table.add_row(
         "Monthly Usage",
-        Text(f"{format_number(used)} / {format_number(limit)} ({usage_pct:.1f}%)", style=usage_color),
+        Text(
+            f"{format_number(used)} / {format_number(limit)} ({usage_pct:.1f}%)",
+            style=usage_color,
+        ),
     )
     table.add_row("Remaining", format_number(remaining))
     table.add_row("Rate Limit", f"{data.get('per_minute_limit', 0)} requests/minute")
@@ -466,7 +493,9 @@ def format_pagination(pagination: dict[str, Any], console: Console) -> None:
     end = min(page * per_page, total)
 
     if total > 0:
-        console.print(f"\n[dim]Showing {start}-{end} of {format_number(total)} results (page {page} of {pages})[/]")
+        total_fmt = format_number(total)
+        msg = f"Showing {start}-{end} of {total_fmt} results (page {page} of {pages})"
+        console.print(f"\n[dim]{msg}[/]")
     else:
         console.print("\n[dim]No results found[/]")
 
