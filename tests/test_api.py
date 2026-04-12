@@ -179,12 +179,20 @@ class TestUsage:
         respx.get("https://test.colacloud.us/api/v1/usage").mock(
             return_value=httpx.Response(
                 200,
-                json={"data": {"requests_used": 100, "requests_limit": 500}},
+                json={
+                    "data": {
+                        "tier": "free",
+                        "current_period": "2024-01",
+                        "detail_views": {"used": 100, "limit": 200, "remaining": 100},
+                        "list_records": {"used": 500, "limit": 10000, "remaining": 9500},
+                        "per_minute_limit": 10,
+                    }
+                },
             )
         )
 
         result = client.get_usage()
-        assert result["data"]["requests_used"] == 100
+        assert result["data"]["detail_views"]["used"] == 100
 
 
 class TestErrorHandling:

@@ -216,10 +216,10 @@ class TestUsageCommand:
                 json={
                     "data": {
                         "tier": "free",
-                        "requests_used": 50,
-                        "requests_limit": 500,
-                        "period_start": "2024-01-01",
-                        "period_end": "2024-01-31",
+                        "current_period": "2024-01",
+                        "detail_views": {"used": 50, "limit": 200, "remaining": 150},
+                        "list_records": {"used": 1000, "limit": 10000, "remaining": 9000},
+                        "per_minute_limit": 10,
                     }
                 },
             )
@@ -227,7 +227,7 @@ class TestUsageCommand:
 
         result = runner.invoke(cli, ["usage"])
         assert result.exit_code == 0
-        assert "50" in result.output or "requests" in result.output.lower()
+        assert "50" in result.output
 
 
 class TestConfigCommands:

@@ -93,7 +93,7 @@ def format_cola_table(colas: list[dict[str, Any]], console: Console) -> Table:
     table.add_column("Brand", style="bold")
     table.add_column("Product")
     table.add_column("Type")
-    table.add_column("ABV")
+    table.add_column("Origin")
     table.add_column("Approved", style="dim")
 
     for cola in colas:
@@ -105,7 +105,7 @@ def format_cola_table(colas: list[dict[str, Any]], console: Console) -> Table:
             truncate(cola.get("brand_name"), 20),
             truncate(cola.get("product_name"), 25),
             Text(product_type or "", style=type_color),
-            format_percentage(cola.get("abv")),
+            truncate(cola.get("origin_name"), 15),
             format_date(cola.get("approval_date")),
         )
 
@@ -449,29 +449,35 @@ def format_usage(data: dict[str, Any], console: Console) -> None:
     table.add_row("Tier", Text(data.get("tier", "unknown"), style="bold cyan"))
     table.add_row("Current Period", data.get("current_period", ""))
 
-    # Usage bar
-    used = data.get("requests_used", 0)
-    limit = data.get("monthly_limit", 1)
-    remaining = data.get("requests_remaining", 0)
-    usage_pct = (used / limit * 100) if limit > 0 else 0
-
-    # Color based on usage
-    if usage_pct >= 90:
-        usage_color = "red"
-    elif usage_pct >= 75:
-        usage_color = "yellow"
-    else:
-        usage_color = "green"
-
+    # Detail views meter
+    dv = data.get("detail_views", {})
+    dv_used = dv.get("used", 0)
+    dv_limit = dv.get("limit", 1)
+    dv_pct = (dv_used / dv_limit * 100) if dv_limit > 0 else 0
+    dv_color = "red" if dv_pct >= 90 else ("yellow" if dv_pct >= 75 else "green")
     table.add_row(
-        "Monthly Usage",
+        "Detail Views",
         Text(
-            f"{format_number(used)} / {format_number(limit)} ({usage_pct:.1f}%)",
-            style=usage_color,
+            f"{format_number(dv_used)} / {format_number(dv_limit)} ({dv_pct:.1f}%)",
+            style=dv_color,
         ),
     )
-    table.add_row("Remaining", format_number(remaining))
-    table.add_row("Rate Limit", f"{data.get('per_minute_limit', 0)} requests/minute")
+
+    # List records meter
+    lr = data.get("list_records", {})
+    lr_used = lr.get("used", 0)
+    lr_limit = lr.get("limit", 1)
+    lr_pct = (lr_used / lr_limit * 100) if lr_limit > 0 else 0
+    lr_color = "red" if lr_pct >= 90 else ("yellow" if lr_pct >= 75 else "green")
+    table.add_row(
+        "List Records",
+        Text(
+            f"{format_number(lr_used)} / {format_number(lr_limit)} ({lr_pct:.1f}%)",
+            style=lr_color,
+        ),
+    )
+
+    table.add_row("Burst Limit", f"{data.get('per_minute_limit', 0)} requests/minute")
 
     console.print(table)
 
