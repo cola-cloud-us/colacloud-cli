@@ -311,6 +311,163 @@ class ColaCloudClient:
         response = self._client.get(f"/barcode/{barcode_value}")
         return self._handle_response(response)
 
+    # Processing times endpoints
+
+    def list_processing_times(
+        self,
+        commodity: str | None = None,
+    ) -> dict[str, Any]:
+        """Get COLA processing times.
+
+        Args:
+            commodity: Filter by commodity type.
+
+        Returns:
+            API response with processing times data.
+        """
+        self._require_api_key()
+
+        params: dict[str, Any] = {}
+        if commodity:
+            params["commodity"] = commodity
+
+        response = self._client.get("/processing-times", params=params)
+        return self._handle_response(response)
+
+    def list_formula_processing_times(
+        self,
+        formula_type: str | None = None,
+        commodity: str | None = None,
+    ) -> dict[str, Any]:
+        """Get formula processing times.
+
+        Args:
+            formula_type: Filter by formula type.
+            commodity: Filter by commodity type.
+
+        Returns:
+            API response with formula processing times data.
+        """
+        self._require_api_key()
+
+        params: dict[str, Any] = {}
+        if formula_type:
+            params["formula_type"] = formula_type
+        if commodity:
+            params["commodity"] = commodity
+
+        response = self._client.get("/processing-times/formula", params=params)
+        return self._handle_response(response)
+
+    def list_registration_processing_times(
+        self,
+        category: str | None = None,
+        application_type: str | None = None,
+    ) -> dict[str, Any]:
+        """Get registration processing times.
+
+        Args:
+            category: Filter by category.
+            application_type: Filter by application type.
+
+        Returns:
+            API response with registration processing times data.
+        """
+        self._require_api_key()
+
+        params: dict[str, Any] = {}
+        if category:
+            params["category"] = category
+        if application_type:
+            params["application_type"] = application_type
+
+        response = self._client.get("/processing-times/registration", params=params)
+        return self._handle_response(response)
+
+    # Production reports endpoint
+
+    def list_production_reports(
+        self,
+        commodity: str | None = None,
+        year: int | None = None,
+        month: int | None = None,
+        report_type: str | None = None,
+        statistical_group: str | None = None,
+        page: int = 1,
+        per_page: int = 100,
+    ) -> dict[str, Any]:
+        """Get production reports.
+
+        Args:
+            commodity: Filter by commodity type.
+            year: Filter by year.
+            month: Filter by month.
+            report_type: Filter by report type.
+            statistical_group: Filter by statistical group.
+            page: Page number.
+            per_page: Results per page (max 100).
+
+        Returns:
+            API response with production reports data.
+        """
+        self._require_api_key()
+
+        params: dict[str, Any] = {"page": page, "per_page": per_page}
+        if commodity:
+            params["commodity"] = commodity
+        if year is not None:
+            params["year"] = year
+        if month is not None:
+            params["month"] = month
+        if report_type:
+            params["report_type"] = report_type
+        if statistical_group:
+            params["statistical_group"] = statistical_group
+
+        response = self._client.get("/production-reports", params=params)
+        return self._handle_response(response)
+
+    # AVA endpoints
+
+    def list_avas(
+        self,
+        state: str | None = None,
+        query: str | None = None,
+    ) -> dict[str, Any]:
+        """List American Viticultural Areas (AVAs).
+
+        Args:
+            state: Filter by state.
+            query: Search by name.
+
+        Returns:
+            API response with AVA data.
+        """
+        self._require_api_key()
+
+        params: dict[str, Any] = {}
+        if state:
+            params["state"] = state
+        if query:
+            params["q"] = query
+
+        response = self._client.get("/avas", params=params)
+        return self._handle_response(response)
+
+    def get_ava(self, ava_id: str) -> dict[str, Any]:
+        """Get a single AVA by ID.
+
+        Args:
+            ava_id: The AVA identifier.
+
+        Returns:
+            API response with AVA details.
+        """
+        self._require_api_key()
+
+        response = self._client.get(f"/avas/{ava_id}")
+        return self._handle_response(response)
+
     # Usage endpoint
 
     def get_usage(self) -> dict[str, Any]:

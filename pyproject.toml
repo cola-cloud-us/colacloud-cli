@@ -1,6 +1,6 @@
 [project]
 name = "colacloud-cli"
-version = "0.2.0"
+version = "0.3.0"
 description = "Command-line interface for the COLA Cloud API"
 readme = "README.md"
 license = { text = "MIT" }
@@ -33,7 +33,7 @@ cola = "colacloud_cli.main:cli"
 
 [project.urls]
 Homepage = "https://colacloud.us"
-Documentation = "https://colacloud.us/docs/api"
+Documentation = "https://docs.colacloud.us/api-reference"
 Repository = "https://github.com/cola-cloud-us/colacloud-cli"
 
 [build-system]

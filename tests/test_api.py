@@ -195,6 +195,220 @@ class TestUsage:
         assert result["data"]["detail_views"]["used"] == 100
 
 
+class TestProcessingTimes:
+    @respx.mock
+    def test_list_processing_times(self, client):
+        """list_processing_times returns results."""
+        respx.get("https://test.colacloud.us/api/v1/processing-times").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "data": [{"commodity": "wine", "avg_days": 30}],
+                    "meta": {"total": 1},
+                },
+            )
+        )
+
+        result = client.list_processing_times()
+        assert len(result["data"]) == 1
+        assert result["data"][0]["commodity"] == "wine"
+
+    @respx.mock
+    def test_list_processing_times_with_commodity(self, client):
+        """list_processing_times passes commodity filter."""
+        route = respx.get("https://test.colacloud.us/api/v1/processing-times").mock(
+            return_value=httpx.Response(
+                200, json={"data": [], "meta": {"total": 0}}
+            )
+        )
+
+        client.list_processing_times(commodity="wine")
+        request = route.calls[0].request
+        assert "commodity=wine" in str(request.url)
+
+    @respx.mock
+    def test_list_formula_processing_times(self, client):
+        """list_formula_processing_times returns results."""
+        respx.get(
+            "https://test.colacloud.us/api/v1/processing-times/formula"
+        ).mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "data": [{"formula_type": "domestic", "avg_days": 20}],
+                    "meta": {"total": 1},
+                },
+            )
+        )
+
+        result = client.list_formula_processing_times()
+        assert len(result["data"]) == 1
+
+    @respx.mock
+    def test_list_formula_processing_times_with_filters(self, client):
+        """list_formula_processing_times passes filters."""
+        route = respx.get(
+            "https://test.colacloud.us/api/v1/processing-times/formula"
+        ).mock(
+            return_value=httpx.Response(
+                200, json={"data": [], "meta": {"total": 0}}
+            )
+        )
+
+        client.list_formula_processing_times(
+            formula_type="domestic", commodity="wine"
+        )
+        request = route.calls[0].request
+        assert "formula_type=domestic" in str(request.url)
+        assert "commodity=wine" in str(request.url)
+
+    @respx.mock
+    def test_list_registration_processing_times(self, client):
+        """list_registration_processing_times returns results."""
+        respx.get(
+            "https://test.colacloud.us/api/v1/processing-times/registration"
+        ).mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "data": [{"category": "beverage", "avg_days": 15}],
+                    "meta": {"total": 1},
+                },
+            )
+        )
+
+        result = client.list_registration_processing_times()
+        assert len(result["data"]) == 1
+
+    @respx.mock
+    def test_list_registration_processing_times_with_filters(self, client):
+        """list_registration_processing_times passes filters."""
+        route = respx.get(
+            "https://test.colacloud.us/api/v1/processing-times/registration"
+        ).mock(
+            return_value=httpx.Response(
+                200, json={"data": [], "meta": {"total": 0}}
+            )
+        )
+
+        client.list_registration_processing_times(
+            category="beverage", application_type="original"
+        )
+        request = route.calls[0].request
+        assert "category=beverage" in str(request.url)
+        assert "application_type=original" in str(request.url)
+
+
+class TestProductionReports:
+    @respx.mock
+    def test_list_production_reports(self, client):
+        """list_production_reports returns results."""
+        respx.get("https://test.colacloud.us/api/v1/production-reports").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "data": [{"commodity": "wine", "year": 2024}],
+                    "meta": {"total": 1, "page": 1, "per_page": 100, "has_more": False},
+                },
+            )
+        )
+
+        result = client.list_production_reports()
+        assert len(result["data"]) == 1
+        assert result["data"][0]["commodity"] == "wine"
+
+    @respx.mock
+    def test_list_production_reports_with_filters(self, client):
+        """list_production_reports passes filter parameters."""
+        route = respx.get(
+            "https://test.colacloud.us/api/v1/production-reports"
+        ).mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "data": [],
+                    "meta": {"total": 0, "page": 1, "per_page": 100, "has_more": False},
+                },
+            )
+        )
+
+        client.list_production_reports(
+            commodity="wine", year=2024, month=6, report_type="monthly"
+        )
+        request = route.calls[0].request
+        assert "commodity=wine" in str(request.url)
+        assert "year=2024" in str(request.url)
+        assert "month=6" in str(request.url)
+        assert "report_type=monthly" in str(request.url)
+
+
+class TestAVAs:
+    @respx.mock
+    def test_list_avas(self, client):
+        """list_avas returns results."""
+        respx.get("https://test.colacloud.us/api/v1/avas").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "data": [{"id": "napa-valley", "name": "Napa Valley"}],
+                    "meta": {"total": 1},
+                },
+            )
+        )
+
+        result = client.list_avas()
+        assert len(result["data"]) == 1
+        assert result["data"][0]["name"] == "Napa Valley"
+
+    @respx.mock
+    def test_list_avas_with_filters(self, client):
+        """list_avas passes filter parameters."""
+        route = respx.get("https://test.colacloud.us/api/v1/avas").mock(
+            return_value=httpx.Response(
+                200, json={"data": [], "meta": {"total": 0}}
+            )
+        )
+
+        client.list_avas(state="CA", query="napa")
+        request = route.calls[0].request
+        assert "state=CA" in str(request.url)
+        assert "q=napa" in str(request.url)
+
+    @respx.mock
+    def test_get_ava(self, client):
+        """get_ava returns AVA details."""
+        respx.get("https://test.colacloud.us/api/v1/avas/napa-valley").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "data": {
+                        "id": "napa-valley",
+                        "name": "Napa Valley",
+                        "state": "CA",
+                    }
+                },
+            )
+        )
+
+        result = client.get_ava("napa-valley")
+        assert result["data"]["name"] == "Napa Valley"
+
+    @respx.mock
+    def test_get_ava_not_found(self, client):
+        """get_ava raises APIError for 404."""
+        respx.get("https://test.colacloud.us/api/v1/avas/nonexistent").mock(
+            return_value=httpx.Response(
+                404,
+                json={"error": {"code": "not_found", "message": "AVA not found"}},
+            )
+        )
+
+        with pytest.raises(APIError) as exc_info:
+            client.get_ava("nonexistent")
+
+        assert exc_info.value.status_code == 404
+
+
 class TestErrorHandling:
     @respx.mock
     def test_authentication_error(self, client):

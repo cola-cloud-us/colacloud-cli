@@ -238,6 +238,275 @@ class TestConfigCommands:
         assert "config" in result.output.lower() or "api" in result.output.lower()
 
 
+class TestProcessingTimesCommands:
+    @respx.mock
+    def test_processing_times_list(self, runner, api_key):
+        """processing-times list returns results."""
+        respx.get("https://app.colacloud.us/api/v1/processing-times").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "data": [{"commodity": "wine", "avg_days": 30}],
+                    "meta": {"total": 1},
+                },
+            )
+        )
+
+        result = runner.invoke(cli, ["processing-times", "list"])
+        assert result.exit_code == 0
+        assert "wine" in result.output
+
+    @respx.mock
+    def test_processing_times_list_json(self, runner, api_key):
+        """processing-times list --json outputs JSON."""
+        respx.get("https://app.colacloud.us/api/v1/processing-times").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "data": [{"commodity": "wine"}],
+                    "meta": {"total": 1},
+                },
+            )
+        )
+
+        result = runner.invoke(cli, ["processing-times", "list", "--json"])
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert "data" in data
+
+    @respx.mock
+    def test_processing_times_list_empty(self, runner, api_key):
+        """processing-times list shows message when no results."""
+        respx.get("https://app.colacloud.us/api/v1/processing-times").mock(
+            return_value=httpx.Response(
+                200, json={"data": [], "meta": {"total": 0}}
+            )
+        )
+
+        result = runner.invoke(cli, ["processing-times", "list"])
+        assert result.exit_code == 0
+        assert "No processing times found" in result.output
+
+    @respx.mock
+    def test_processing_times_formula(self, runner, api_key):
+        """processing-times formula returns results."""
+        respx.get(
+            "https://app.colacloud.us/api/v1/processing-times/formula"
+        ).mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "data": [{"formula_type": "domestic", "avg_days": 20}],
+                    "meta": {"total": 1},
+                },
+            )
+        )
+
+        result = runner.invoke(cli, ["processing-times", "formula"])
+        assert result.exit_code == 0
+        assert "domestic" in result.output
+
+    @respx.mock
+    def test_processing_times_registration(self, runner, api_key):
+        """processing-times registration returns results."""
+        respx.get(
+            "https://app.colacloud.us/api/v1/processing-times/registration"
+        ).mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "data": [{"category": "beverage", "avg_days": 15}],
+                    "meta": {"total": 1},
+                },
+            )
+        )
+
+        result = runner.invoke(cli, ["processing-times", "registration"])
+        assert result.exit_code == 0
+        assert "beverage" in result.output
+
+
+class TestProductionReportsCommands:
+    @respx.mock
+    def test_production_reports_list(self, runner, api_key):
+        """production-reports list returns results."""
+        respx.get("https://app.colacloud.us/api/v1/production-reports").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "data": [{"commodity": "wine", "year": 2024, "month": 6}],
+                    "meta": {
+                        "total": 1,
+                        "page": 1,
+                        "per_page": 100,
+                        "has_more": False,
+                    },
+                },
+            )
+        )
+
+        result = runner.invoke(cli, ["production-reports", "list"])
+        assert result.exit_code == 0
+        assert "wine" in result.output
+
+    @respx.mock
+    def test_production_reports_list_json(self, runner, api_key):
+        """production-reports list --json outputs JSON."""
+        respx.get("https://app.colacloud.us/api/v1/production-reports").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "data": [{"commodity": "wine"}],
+                    "meta": {
+                        "total": 1,
+                        "page": 1,
+                        "per_page": 100,
+                        "has_more": False,
+                    },
+                },
+            )
+        )
+
+        result = runner.invoke(cli, ["production-reports", "list", "--json"])
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert "data" in data
+
+    @respx.mock
+    def test_production_reports_list_empty(self, runner, api_key):
+        """production-reports list shows message when no results."""
+        respx.get("https://app.colacloud.us/api/v1/production-reports").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "data": [],
+                    "meta": {
+                        "total": 0,
+                        "page": 1,
+                        "per_page": 100,
+                        "has_more": False,
+                    },
+                },
+            )
+        )
+
+        result = runner.invoke(cli, ["production-reports", "list"])
+        assert result.exit_code == 0
+        assert "No production reports found" in result.output
+
+    @respx.mock
+    def test_production_reports_list_with_pagination(self, runner, api_key):
+        """production-reports list shows pagination hint when has_more."""
+        respx.get("https://app.colacloud.us/api/v1/production-reports").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "data": [{"commodity": "wine"}],
+                    "meta": {
+                        "total": 200,
+                        "page": 1,
+                        "per_page": 100,
+                        "has_more": True,
+                    },
+                },
+            )
+        )
+
+        result = runner.invoke(cli, ["production-reports", "list"])
+        assert result.exit_code == 0
+        assert "More results available" in result.output
+
+
+class TestAVAsCommands:
+    @respx.mock
+    def test_avas_list(self, runner, api_key):
+        """avas list returns results."""
+        respx.get("https://app.colacloud.us/api/v1/avas").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "data": [{"id": "napa-valley", "name": "Napa Valley"}],
+                    "meta": {"total": 1},
+                },
+            )
+        )
+
+        result = runner.invoke(cli, ["avas", "list"])
+        assert result.exit_code == 0
+        assert "Napa Valley" in result.output
+
+    @respx.mock
+    def test_avas_list_json(self, runner, api_key):
+        """avas list --json outputs JSON."""
+        respx.get("https://app.colacloud.us/api/v1/avas").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "data": [{"id": "napa-valley", "name": "Napa Valley"}],
+                    "meta": {"total": 1},
+                },
+            )
+        )
+
+        result = runner.invoke(cli, ["avas", "list", "--json"])
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert "data" in data
+
+    @respx.mock
+    def test_avas_list_empty(self, runner, api_key):
+        """avas list shows message when no results."""
+        respx.get("https://app.colacloud.us/api/v1/avas").mock(
+            return_value=httpx.Response(
+                200, json={"data": [], "meta": {"total": 0}}
+            )
+        )
+
+        result = runner.invoke(cli, ["avas", "list"])
+        assert result.exit_code == 0
+        assert "No AVAs found" in result.output
+
+    @respx.mock
+    def test_avas_get(self, runner, api_key):
+        """avas get returns AVA details."""
+        respx.get("https://app.colacloud.us/api/v1/avas/napa-valley").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "data": {
+                        "id": "napa-valley",
+                        "name": "Napa Valley",
+                        "state": "CA",
+                    }
+                },
+            )
+        )
+
+        result = runner.invoke(cli, ["avas", "get", "napa-valley"])
+        assert result.exit_code == 0
+        assert "Napa Valley" in result.output
+
+    @respx.mock
+    def test_avas_get_json(self, runner, api_key):
+        """avas get --json outputs JSON."""
+        respx.get("https://app.colacloud.us/api/v1/avas/napa-valley").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "data": {
+                        "id": "napa-valley",
+                        "name": "Napa Valley",
+                    }
+                },
+            )
+        )
+
+        result = runner.invoke(cli, ["avas", "get", "napa-valley", "--json"])
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert "data" in data
+
+
 class TestCommandAliases:
     @respx.mock
     def test_shortcut_s_for_colas(self, runner, api_key):

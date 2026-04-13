@@ -4,10 +4,13 @@ import click
 from rich.console import Console
 
 from colacloud_cli import __version__
+from colacloud_cli.commands.avas import avas_group
 from colacloud_cli.commands.barcode import barcode_command
 from colacloud_cli.commands.colas import colas_group
 from colacloud_cli.commands.config import config_group
 from colacloud_cli.commands.permittees import permittees_group
+from colacloud_cli.commands.processing_times import processing_times_group
+from colacloud_cli.commands.production_reports import production_reports_group
 from colacloud_cli.commands.usage import usage_command
 
 console = Console()
@@ -29,6 +32,9 @@ class AliasedGroup(click.Group):
             "c": "config",
             "b": "barcode",
             "u": "usage",
+            "pt": "processing-times",
+            "pr": "production-reports",
+            "a": "avas",
         }
 
         if cmd_name in aliases:
@@ -76,7 +82,7 @@ def cli(ctx: click.Context) -> None:
         cola barcode 012345678901
         cola usage
 
-    For more information, visit https://colacloud.us/docs/api
+    For more information, visit https://docs.colacloud.us
     """
     ctx.ensure_object(dict)
 
@@ -87,6 +93,9 @@ cli.add_command(colas_group)
 cli.add_command(permittees_group)
 cli.add_command(barcode_command)
 cli.add_command(usage_command)
+cli.add_command(processing_times_group)
+cli.add_command(production_reports_group)
+cli.add_command(avas_group)
 
 
 def main() -> None:
