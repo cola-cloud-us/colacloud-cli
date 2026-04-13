@@ -383,23 +383,25 @@ def format_permittee_detail(permittee: dict[str, Any], console: Console) -> None
     console.print("[bold]Company Information[/]")
     console.print(info_table)
 
-    # COLA stats
-    stats_table = Table(show_header=False, box=None, padding=(0, 2))
-    stats_table.add_column("Field", style="dim")
-    stats_table.add_column("Value")
+    # COLA stats (paid plans only)
+    if permittee.get("colas") is not None:
+        stats_table = Table(show_header=False, box=None, padding=(0, 2))
+        stats_table.add_column("Field", style="dim")
+        stats_table.add_column("Value")
 
-    stats_table.add_row("Total COLAs", format_number(permittee.get("colas")))
-    stats_table.add_row(
-        "Approved COLAs", format_number(permittee.get("colas_approved"))
-    )
-    if permittee.get("last_cola_application_date"):
+        stats_table.add_row("Total COLAs", format_number(permittee.get("colas")))
         stats_table.add_row(
-            "Last Application", format_date(permittee.get("last_cola_application_date"))
+            "Approved COLAs", format_number(permittee.get("colas_approved"))
         )
+        if permittee.get("last_cola_application_date"):
+            stats_table.add_row(
+                "Last Application",
+                format_date(permittee.get("last_cola_application_date")),
+            )
 
-    console.print()
-    console.print("[bold]COLA Statistics[/]")
-    console.print(stats_table)
+        console.print()
+        console.print("[bold]COLA Statistics[/]")
+        console.print(stats_table)
 
     # Recent COLAs
     recent_colas = permittee.get("recent_colas", [])
