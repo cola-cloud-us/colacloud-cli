@@ -383,7 +383,6 @@ def format_permittee_detail(permittee: dict[str, Any], console: Console) -> None
     console.print("[bold]Company Information[/]")
     console.print(info_table)
 
-    # COLA stats (paid plans only)
     if permittee.get("colas") is not None:
         stats_table = Table(show_header=False, box=None, padding=(0, 2))
         stats_table.add_column("Field", style="dim")

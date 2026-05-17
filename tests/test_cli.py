@@ -218,7 +218,11 @@ class TestUsageCommand:
                         "tier": "free",
                         "current_period": "2024-01",
                         "detail_views": {"used": 50, "limit": 200, "remaining": 150},
-                        "list_records": {"used": 1000, "limit": 10000, "remaining": 9000},
+                        "list_records": {
+                            "used": 1000,
+                            "limit": 10000,
+                            "remaining": 9000,
+                        },
                         "per_minute_limit": 10,
                     }
                 },

@@ -65,7 +65,9 @@ def main():
 
     api_key = os.environ.get("COLA_API_KEY") or os.environ.get("COLACLOUD_API_KEY")
     if not api_key:
-        print("Error: COLA_API_KEY or COLACLOUD_API_KEY environment variable is required")
+        print(
+            "Error: COLA_API_KEY or COLACLOUD_API_KEY environment variable is required"
+        )
         sys.exit(1)
 
     env = {"COLACLOUD_API_KEY": api_key}
@@ -89,7 +91,9 @@ def main():
 
     def test_colas_list():
         nonlocal ttb_id
-        rc, out, err = run_cola("colas", "list", "--limit", "1", "--json", env_override=env)
+        rc, out, err = run_cola(
+            "colas", "list", "--limit", "1", "--json", env_override=env
+        )
         assert rc == 0, f"exit code {rc}: {err}"
         data = json.loads(out)
         assert "data" in data, "missing 'data' key"
@@ -164,7 +168,10 @@ def main():
         data = json.loads(out)
         assert "data" in data
         usage = data["data"]
-        return f"tier={usage.get('tier')}, used={usage.get('requests_used')}/{usage.get('monthly_limit')}"
+        return (
+            f"tier={usage.get('tier')}, "
+            f"used={usage.get('requests_used')}/{usage.get('monthly_limit')}"
+        )
 
     check("cola usage --json", test_usage)
 

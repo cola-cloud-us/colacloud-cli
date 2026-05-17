@@ -184,7 +184,11 @@ class TestUsage:
                         "tier": "free",
                         "current_period": "2024-01",
                         "detail_views": {"used": 100, "limit": 200, "remaining": 100},
-                        "list_records": {"used": 500, "limit": 10000, "remaining": 9500},
+                        "list_records": {
+                            "used": 500,
+                            "limit": 10000,
+                            "remaining": 9500,
+                        },
                         "per_minute_limit": 10,
                     }
                 },
