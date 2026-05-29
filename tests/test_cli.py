@@ -44,7 +44,7 @@ class TestColasCommands:
     @respx.mock
     def test_colas_list(self, runner, api_key):
         """colas list returns results."""
-        respx.get("https://app.colacloud.us/api/v1/colas").mock(
+        route = respx.get("https://app.colacloud.us/api/v1/colas").mock(
             return_value=httpx.Response(
                 200,
                 json={
@@ -67,9 +67,38 @@ class TestColasCommands:
             )
         )
 
-        result = runner.invoke(cli, ["colas", "list", "-q", "test"])
+        result = runner.invoke(
+            cli,
+            [
+                "colas",
+                "list",
+                "-q",
+                "test",
+                "--product-type",
+                "wine",
+                "--product-type",
+                "malt beverage",
+                "--category",
+                "Beer",
+                "--container-type",
+                "can",
+                "--volume-unit",
+                "fluid ounces",
+                "--volume-min",
+                "12",
+                "--volume-max",
+                "16",
+            ],
+        )
         assert result.exit_code == 0
         assert "Test Brand" in result.output
+        request_url = str(route.calls[0].request.url)
+        assert "product_type=wine%2Cmalt+beverage" in request_url
+        assert "category=Beer" in request_url
+        assert "container_type=can" in request_url
+        assert "volume_unit=fluid+ounces" in request_url
+        assert "volume_min=12" in request_url
+        assert "volume_max=16" in request_url
 
     @respx.mock
     def test_colas_list_json(self, runner, api_key):

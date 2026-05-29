@@ -73,8 +73,12 @@ cola colas list --date-from 2024-01-01 --date-to 2024-12-31
 # Filter by ABV
 cola colas list --product-type "distilled spirits" --abv-min 40 --abv-max 50
 
-# Search by brand name
-cola colas list --brand "maker's mark"
+# Filter by package and derived category
+cola colas list --category Beer --derived-subcategory "Beer > Ale" \
+  --container-type can --volume-unit "fluid ounces" --volume-min 12 --volume-max 16
+
+# Search generic text, including applicant/company names
+cola colas list -q "molson coors"
 
 # Pagination
 cola colas list -q "bourbon" --limit 50 --page 2
@@ -90,14 +94,24 @@ cola colas list -q "whiskey" --json | jq '.data[].brand_name'
 
 | Option | Description |
 |--------|-------------|
-| `-q, --query` | Full-text search query |
-| `--product-type` | Filter by type: `malt beverage`, `wine`, `distilled spirits` |
+| `-q, --query` | Generic text query across brand, product, permit, applicant/company, and related text |
+| `--product-type` | Filter by TTB type: `malt beverage`, `wine`, `distilled spirits`; can be used multiple times |
+| `--category` | Filter by derived category: `Beer`, `Wine`, `Liquor`; can be used multiple times |
+| `--derived-subcategory` | Filter by derived category path prefix, such as `Beer > Ale` |
 | `--origin` | Filter by country/state |
+| `--domestic-or-imported` | Filter by `domestic` or `imported` |
+| `--status` | Filter by application status |
 | `--brand` | Filter by brand name (partial match) |
+| `--permit-number` | Filter by exact permit number |
+| `--barcode` | Filter by exact main barcode value |
 | `--date-from` | Minimum approval date (YYYY-MM-DD) |
 | `--date-to` | Maximum approval date (YYYY-MM-DD) |
 | `--abv-min` | Minimum ABV percentage |
 | `--abv-max` | Maximum ABV percentage |
+| `--volume-unit` | Package volume unit; required with `--volume-min` or `--volume-max` |
+| `--volume-min` | Minimum package volume |
+| `--volume-max` | Maximum package volume |
+| `--container-type` | Derived container type; can be used multiple times |
 | `--limit` | Results per page (max 100) |
 | `--page` | Page number |
 | `--json` | Output as JSON |
