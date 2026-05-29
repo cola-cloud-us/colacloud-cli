@@ -86,9 +86,19 @@ class TestListColas:
 
         client.list_colas(
             query="bourbon",
-            product_type="distilled spirits",
+            product_type="distilled spirits,wine",
+            category="Liquor,Wine",
+            derived_subcategory="Liquor > Whiskey",
             origin="kentucky",
+            domestic_or_imported="domestic",
+            status="approved",
+            permit_number="KY-I-12345",
+            barcode_value="012345678905",
             abv_min=40.0,
+            volume_unit="milliliters",
+            volume_min=375,
+            volume_max=750,
+            container_type="bottle,can",
         )
 
         request = route.calls[0].request
@@ -96,6 +106,16 @@ class TestListColas:
         assert "product_type=distilled" in str(request.url)
         assert "origin=kentucky" in str(request.url)
         assert "abv_min=40" in str(request.url)
+        assert "category=Liquor%2CWine" in str(request.url)
+        assert "derived_subcategory=Liquor+%3E+Whiskey" in str(request.url)
+        assert "domestic_or_imported=domestic" in str(request.url)
+        assert "status=approved" in str(request.url)
+        assert "permit_number=KY-I-12345" in str(request.url)
+        assert "barcode_value=012345678905" in str(request.url)
+        assert "volume_unit=milliliters" in str(request.url)
+        assert "volume_min=375" in str(request.url)
+        assert "volume_max=750" in str(request.url)
+        assert "container_type=bottle%2Ccan" in str(request.url)
 
 
 class TestGetCola:

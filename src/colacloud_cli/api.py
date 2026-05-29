@@ -181,26 +181,46 @@ class ColaCloudClient:
         self,
         query: str | None = None,
         product_type: str | None = None,
+        category: str | None = None,
+        derived_subcategory: str | None = None,
         origin: str | None = None,
+        domestic_or_imported: str | None = None,
+        status: str | None = None,
         brand_name: str | None = None,
+        permit_number: str | None = None,
+        barcode_value: str | None = None,
         approval_date_from: str | None = None,
         approval_date_to: str | None = None,
         abv_min: float | None = None,
         abv_max: float | None = None,
+        volume_unit: str | None = None,
+        volume_min: float | None = None,
+        volume_max: float | None = None,
+        container_type: str | None = None,
         page: int = 1,
         per_page: int = 20,
     ) -> dict[str, Any]:
         """Search and filter COLAs.
 
         Args:
-            query: Full-text search query.
-            product_type: Filter by product type.
+            query: Text search query, including applicant/company names.
+            product_type: Filter by one or more TTB product types.
+            category: Filter by derived top-level category.
+            derived_subcategory: Filter by derived category path prefix.
             origin: Filter by country/state.
+            domestic_or_imported: Filter by domestic/imported origin.
+            status: Filter by application status.
             brand_name: Filter by brand name (partial match).
+            permit_number: Filter by exact permit number.
+            barcode_value: Filter by exact main barcode value.
             approval_date_from: Filter by minimum approval date (YYYY-MM-DD).
             approval_date_to: Filter by maximum approval date (YYYY-MM-DD).
             abv_min: Filter by minimum ABV.
             abv_max: Filter by maximum ABV.
+            volume_unit: Filter by volume unit. Required with volume_min/volume_max.
+            volume_min: Filter by minimum package volume.
+            volume_max: Filter by maximum package volume.
+            container_type: Filter by one or more derived container types.
             page: Page number.
             per_page: Results per page (max 100).
 
@@ -215,10 +235,22 @@ class ColaCloudClient:
             params["q"] = query
         if product_type:
             params["product_type"] = product_type
+        if category:
+            params["category"] = category
+        if derived_subcategory:
+            params["derived_subcategory"] = derived_subcategory
         if origin:
             params["origin"] = origin
+        if domestic_or_imported:
+            params["domestic_or_imported"] = domestic_or_imported
+        if status:
+            params["status"] = status
         if brand_name:
             params["brand_name"] = brand_name
+        if permit_number:
+            params["permit_number"] = permit_number
+        if barcode_value:
+            params["barcode_value"] = barcode_value
         if approval_date_from:
             params["approval_date_from"] = approval_date_from
         if approval_date_to:
@@ -227,6 +259,14 @@ class ColaCloudClient:
             params["abv_min"] = abv_min
         if abv_max is not None:
             params["abv_max"] = abv_max
+        if volume_unit:
+            params["volume_unit"] = volume_unit
+        if volume_min is not None:
+            params["volume_min"] = volume_min
+        if volume_max is not None:
+            params["volume_max"] = volume_max
+        if container_type:
+            params["container_type"] = container_type
 
         response = self._client.get("/colas", params=params)
         return self._handle_response(response)
