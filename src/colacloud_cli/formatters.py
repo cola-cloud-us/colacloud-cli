@@ -494,6 +494,16 @@ def format_pagination(pagination: dict[str, Any], console: Console) -> None:
     pages = pagination.get("pages", 1)
     total = pagination.get("total", 0)
     per_page = pagination.get("per_page", 20)
+    has_more = pagination.get("has_more")
+
+    if total is None:
+        msg = f"Showing page {page}"
+        if has_more is True:
+            msg += " (more results available)"
+        elif has_more is False:
+            msg += " (end of results)"
+        console.print(f"\n[dim]{msg}[/]")
+        return
 
     # Calculate showing range
     start = (page - 1) * per_page + 1
