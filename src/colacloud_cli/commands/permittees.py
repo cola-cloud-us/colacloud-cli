@@ -26,6 +26,14 @@ def permittees_group():
 @click.option(
     "--limit", "per_page", default=20, type=int, help="Results per page (max 100)."
 )
+@click.option(
+    "--sort",
+    type=click.Choice(
+        ["colas_desc", "company_name_asc", "last_cola_desc", "relevance_desc"],
+        case_sensitive=False,
+    ),
+    help="Sort order. Use relevance_desc with --query for score-first results.",
+)
 @click.option("--page", default=1, type=int, help="Page number.")
 @click.option("--json", "as_json", is_flag=True, help="Output as JSON.")
 def list_permittees(
@@ -33,6 +41,7 @@ def list_permittees(
     state: str | None,
     active: bool | None,
     per_page: int,
+    sort: str | None,
     page: int,
     as_json: bool,
 ):
@@ -58,6 +67,7 @@ def list_permittees(
                 query=query,
                 state=state,
                 is_active=active,
+                sort=sort,
                 page=page,
                 per_page=min(per_page, 100),
             )

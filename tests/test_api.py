@@ -99,6 +99,7 @@ class TestListColas:
             volume_min=375,
             volume_max=750,
             container_type="bottle,can",
+            sort="relevance_desc",
         )
 
         request = route.calls[0].request
@@ -116,6 +117,7 @@ class TestListColas:
         assert "volume_min=375" in str(request.url)
         assert "volume_max=750" in str(request.url)
         assert "container_type=bottle%2Ccan" in str(request.url)
+        assert "sort=relevance_desc" in str(request.url)
 
 
 class TestGetCola:
@@ -153,15 +155,17 @@ class TestPermittees:
     @respx.mock
     def test_list_permittees(self, client):
         """list_permittees returns results."""
-        respx.get("https://test.colacloud.us/api/v1/permittees").mock(
+        route = respx.get("https://test.colacloud.us/api/v1/permittees").mock(
             return_value=httpx.Response(
                 200,
                 json={"data": [{"permit_number": "KY-1234"}], "pagination": {}},
             )
         )
 
-        result = client.list_permittees(state="KY")
+        result = client.list_permittees(state="KY", sort="relevance_desc")
         assert len(result["data"]) == 1
+        request = route.calls[0].request
+        assert "sort=relevance_desc" in str(request.url)
 
     @respx.mock
     def test_get_permittee(self, client):
@@ -241,9 +245,7 @@ class TestProcessingTimes:
     def test_list_processing_times_with_commodity(self, client):
         """list_processing_times passes commodity filter."""
         route = respx.get("https://test.colacloud.us/api/v1/processing-times").mock(
-            return_value=httpx.Response(
-                200, json={"data": [], "meta": {"total": 0}}
-            )
+            return_value=httpx.Response(200, json={"data": [], "meta": {"total": 0}})
         )
 
         client.list_processing_times(commodity="wine")
@@ -253,9 +255,7 @@ class TestProcessingTimes:
     @respx.mock
     def test_list_formula_processing_times(self, client):
         """list_formula_processing_times returns results."""
-        respx.get(
-            "https://test.colacloud.us/api/v1/processing-times/formula"
-        ).mock(
+        respx.get("https://test.colacloud.us/api/v1/processing-times/formula").mock(
             return_value=httpx.Response(
                 200,
                 json={
@@ -274,14 +274,10 @@ class TestProcessingTimes:
         route = respx.get(
             "https://test.colacloud.us/api/v1/processing-times/formula"
         ).mock(
-            return_value=httpx.Response(
-                200, json={"data": [], "meta": {"total": 0}}
-            )
+            return_value=httpx.Response(200, json={"data": [], "meta": {"total": 0}})
         )
 
-        client.list_formula_processing_times(
-            formula_type="domestic", commodity="wine"
-        )
+        client.list_formula_processing_times(formula_type="domestic", commodity="wine")
         request = route.calls[0].request
         assert "formula_type=domestic" in str(request.url)
         assert "commodity=wine" in str(request.url)
@@ -310,9 +306,7 @@ class TestProcessingTimes:
         route = respx.get(
             "https://test.colacloud.us/api/v1/processing-times/registration"
         ).mock(
-            return_value=httpx.Response(
-                200, json={"data": [], "meta": {"total": 0}}
-            )
+            return_value=httpx.Response(200, json={"data": [], "meta": {"total": 0}})
         )
 
         client.list_registration_processing_times(
@@ -344,9 +338,7 @@ class TestProductionReports:
     @respx.mock
     def test_list_production_reports_with_filters(self, client):
         """list_production_reports passes filter parameters."""
-        route = respx.get(
-            "https://test.colacloud.us/api/v1/production-reports"
-        ).mock(
+        route = respx.get("https://test.colacloud.us/api/v1/production-reports").mock(
             return_value=httpx.Response(
                 200,
                 json={
@@ -388,9 +380,7 @@ class TestAVAs:
     def test_list_avas_with_filters(self, client):
         """list_avas passes filter parameters."""
         route = respx.get("https://test.colacloud.us/api/v1/avas").mock(
-            return_value=httpx.Response(
-                200, json={"data": [], "meta": {"total": 0}}
-            )
+            return_value=httpx.Response(200, json={"data": [], "meta": {"total": 0}})
         )
 
         client.list_avas(state="CA", query="napa")

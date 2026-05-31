@@ -197,6 +197,7 @@ class ColaCloudClient:
         volume_min: float | None = None,
         volume_max: float | None = None,
         container_type: str | None = None,
+        sort: str | None = None,
         page: int = 1,
         per_page: int = 20,
     ) -> dict[str, Any]:
@@ -221,6 +222,7 @@ class ColaCloudClient:
             volume_min: Filter by minimum package volume.
             volume_max: Filter by maximum package volume.
             container_type: Filter by one or more derived container types.
+            sort: Sort order, such as approval_date_desc or relevance_desc.
             page: Page number.
             per_page: Results per page (max 100).
 
@@ -229,7 +231,7 @@ class ColaCloudClient:
         """
         self._require_api_key()
 
-        params = {"page": page, "per_page": per_page}
+        params: dict[str, str | int | float] = {"page": page, "per_page": per_page}
 
         if query:
             params["q"] = query
@@ -267,6 +269,8 @@ class ColaCloudClient:
             params["volume_max"] = volume_max
         if container_type:
             params["container_type"] = container_type
+        if sort:
+            params["sort"] = sort
 
         response = self._client.get("/colas", params=params)
         return self._handle_response(response)
@@ -292,6 +296,7 @@ class ColaCloudClient:
         query: str | None = None,
         state: str | None = None,
         is_active: bool | None = None,
+        sort: str | None = None,
         page: int = 1,
         per_page: int = 20,
     ) -> dict[str, Any]:
@@ -301,6 +306,7 @@ class ColaCloudClient:
             query: Search by company name (partial match).
             state: Filter by state.
             is_active: Filter by active status.
+            sort: Sort order, such as colas_desc or relevance_desc.
             page: Page number.
             per_page: Results per page (max 100).
 
@@ -309,7 +315,7 @@ class ColaCloudClient:
         """
         self._require_api_key()
 
-        params = {"page": page, "per_page": per_page}
+        params: dict[str, str | int | float] = {"page": page, "per_page": per_page}
 
         if query:
             params["q"] = query
@@ -317,6 +323,8 @@ class ColaCloudClient:
             params["state"] = state.upper()
         if is_active is not None:
             params["is_active"] = "true" if is_active else "false"
+        if sort:
+            params["sort"] = sort
 
         response = self._client.get("/permittees", params=params)
         return self._handle_response(response)
