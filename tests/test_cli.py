@@ -88,6 +88,8 @@ class TestColasCommands:
                 "12",
                 "--volume-max",
                 "16",
+                "--sort",
+                "relevance_desc",
             ],
         )
         assert result.exit_code == 0
@@ -99,6 +101,7 @@ class TestColasCommands:
         assert "volume_unit=fluid+ounces" in request_url
         assert "volume_min=12" in request_url
         assert "volume_max=16" in request_url
+        assert "sort=relevance_desc" in request_url
 
     @respx.mock
     def test_colas_list_json(self, runner, api_key):
@@ -171,7 +174,7 @@ class TestPermitteesCommands:
     @respx.mock
     def test_permittees_list(self, runner, api_key):
         """permittees list returns results."""
-        respx.get("https://app.colacloud.us/api/v1/permittees").mock(
+        route = respx.get("https://app.colacloud.us/api/v1/permittees").mock(
             return_value=httpx.Response(
                 200,
                 json={
@@ -188,9 +191,12 @@ class TestPermitteesCommands:
             )
         )
 
-        result = runner.invoke(cli, ["permittees", "list", "--state", "KY"])
+        result = runner.invoke(
+            cli, ["permittees", "list", "--state", "KY", "--sort", "relevance_desc"]
+        )
         assert result.exit_code == 0
         assert "Kentucky Distillery" in result.output
+        assert "sort=relevance_desc" in str(route.calls[0].request.url)
 
     @respx.mock
     def test_permittees_get(self, runner, api_key):
@@ -311,9 +317,7 @@ class TestProcessingTimesCommands:
     def test_processing_times_list_empty(self, runner, api_key):
         """processing-times list shows message when no results."""
         respx.get("https://app.colacloud.us/api/v1/processing-times").mock(
-            return_value=httpx.Response(
-                200, json={"data": [], "meta": {"total": 0}}
-            )
+            return_value=httpx.Response(200, json={"data": [], "meta": {"total": 0}})
         )
 
         result = runner.invoke(cli, ["processing-times", "list"])
@@ -323,9 +327,7 @@ class TestProcessingTimesCommands:
     @respx.mock
     def test_processing_times_formula(self, runner, api_key):
         """processing-times formula returns results."""
-        respx.get(
-            "https://app.colacloud.us/api/v1/processing-times/formula"
-        ).mock(
+        respx.get("https://app.colacloud.us/api/v1/processing-times/formula").mock(
             return_value=httpx.Response(
                 200,
                 json={
@@ -342,9 +344,7 @@ class TestProcessingTimesCommands:
     @respx.mock
     def test_processing_times_registration(self, runner, api_key):
         """processing-times registration returns results."""
-        respx.get(
-            "https://app.colacloud.us/api/v1/processing-times/registration"
-        ).mock(
+        respx.get("https://app.colacloud.us/api/v1/processing-times/registration").mock(
             return_value=httpx.Response(
                 200,
                 json={
@@ -490,9 +490,7 @@ class TestAVAsCommands:
     def test_avas_list_empty(self, runner, api_key):
         """avas list shows message when no results."""
         respx.get("https://app.colacloud.us/api/v1/avas").mock(
-            return_value=httpx.Response(
-                200, json={"data": [], "meta": {"total": 0}}
-            )
+            return_value=httpx.Response(200, json={"data": [], "meta": {"total": 0}})
         )
 
         result = runner.invoke(cli, ["avas", "list"])

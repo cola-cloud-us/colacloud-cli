@@ -80,6 +80,9 @@ cola colas list --category Beer --derived-subcategory "Beer > Ale" \
 # Search generic text, including applicant/company names
 cola colas list -q "molson coors"
 
+# Sort text searches by OpenSearch relevance score
+cola colas list -q "bourbon" --sort relevance_desc
+
 # Pagination
 cola colas list -q "bourbon" --limit 50 --page 2
 
@@ -123,6 +126,9 @@ Search and retrieve permittee (alcohol producer/importer) records.
 ```bash
 # Search by company name
 cola permittees list -q "diageo"
+
+# Sort text searches by OpenSearch relevance score
+cola permittees list -q "diageo" --sort relevance_desc
 
 # Filter by state
 cola permittees list --state KY

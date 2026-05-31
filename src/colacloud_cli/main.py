@@ -44,7 +44,7 @@ class AliasedGroup(click.Group):
         # This requires forwarding remaining args to the search subcommand
         if cmd_name == "search":
             colas_group = click.Group.get_command(self, ctx, "colas")
-            if colas_group:
+            if isinstance(colas_group, click.Group):
                 return colas_group.get_command(ctx, "search")
 
         return None
