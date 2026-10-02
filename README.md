@@ -2,7 +2,9 @@
 
 Command-line interface for the [COLA Cloud API](https://colacloud.us) - Access the TTB COLA Registry from your terminal.
 
-COLA Cloud provides access to the United States TTB (Alcohol and Tobacco Tax and Trade Bureau) Certificate of Label Approval registry, containing over 1 million alcohol product label records.
+COLA Cloud provides access to the United States TTB (Alcohol and Tobacco Tax and Trade Bureau) Certificate of Label Approval registry, containing millions of label approval records.
+
+COLA Cloud is an independent service that turns public TTB label approvals into searchable, enriched data. An approval record is not a unique product or proof of current retail availability. See the [product-data workflow and source limits](https://colacloud.us/product-enrichment) and [California wine recipe](https://colacloud.us/data/california-wine).
 
 ## Installation
 
@@ -31,10 +33,14 @@ After installation, the `cola` command will be available.
    # Enter your API key when prompted
    ```
 
-3. **Start searching:**
+3. **Retrieve one California-origin wine approval in a fixed date scope** (requires `jq`):
    ```bash
-   cola colas search "buffalo trace"
+   cola colas list --product-type wine --origin California \
+     --date-from 2026-08-01 --date-to 2026-08-31 --limit 1 --json > colas.json
+   ttb_id=$(jq -r '.data[0].ttb_id // empty' colas.json)
+   if [ -n "$ttb_id" ]; then cola colas get "$ttb_id" --json; fi
    ```
+   An empty result is valid. This is one page of approval records, not all wines or proof of current sale.
 
 ## Commands
 
@@ -86,8 +92,8 @@ cola colas list -q "bourbon" --sort relevance_desc
 # Pagination
 cola colas list -q "bourbon" --limit 50 --page 2
 
-# Get detailed information about a specific COLA
-cola colas get 24001234
+# Retrieve the ID discovered in the quickstart
+cola colas get "$ttb_id"
 
 # Output as JSON (for scripting)
 cola colas list -q "whiskey" --json | jq '.data[].brand_name'
@@ -101,14 +107,14 @@ cola colas list -q "whiskey" --json | jq '.data[].brand_name'
 | `--product-type` | Filter by TTB type: `malt beverage`, `wine`, `distilled spirits`; can be used multiple times |
 | `--category` | Filter by derived category: `Beer`, `Wine`, `Liquor`; can be used multiple times |
 | `--derived-subcategory` | Filter by derived category path prefix, such as `Beer > Ale` |
-| `--origin` | Filter by country/state |
+| `--origin` | Exact recorded country/state name; not business address or appellation |
 | `--domestic-or-imported` | Filter by `domestic` or `imported` |
 | `--status` | Filter by application status |
 | `--brand` | Filter by brand name (partial match) |
 | `--permit-number` | Filter by exact permit number |
 | `--barcode` | Filter by exact main barcode value |
-| `--date-from` | Minimum approval date (YYYY-MM-DD) |
-| `--date-to` | Maximum approval date (YYYY-MM-DD) |
+| `--date-from` | Minimum scope date (YYYY-MM-DD); approval with application/latest-update fallback |
+| `--date-to` | Maximum scope date (YYYY-MM-DD); same fallback |
 | `--abv-min` | Minimum ABV percentage |
 | `--abv-max` | Maximum ABV percentage |
 | `--volume-unit` | Package volume unit; required with `--volume-min` or `--volume-max` |
@@ -157,17 +163,17 @@ cola permittees list -q "distillery" --json
 
 ### Barcode Lookup
 
-Look up products by their barcode (UPC, EAN, etc.).
+Barcode lookup returns matching approval records from decoded label images. Codes may be missing or repeated across approvals; review the candidate records before treating a match as a product identity. The UPC example uses a code from the [existing whiskey evaluation sample](https://colacloud.us/data-packs/whiskey).
 
 ```bash
 # Look up by UPC
-cola barcode 012345678901
+cola barcode 869357000220
 
 # Look up by EAN
 cola barcode 5000281025155
 
 # Output as JSON
-cola barcode 012345678901 --json
+cola barcode 869357000220 --json
 ```
 
 ### Usage Statistics
@@ -183,6 +189,8 @@ cola usage --json
 ```
 
 ## Output Examples
+
+The following tables are illustrative, not verified record fixtures or current plan limits. For real records use the quickstart. Current searches may omit total/page counts.
 
 ### COLA List
 
@@ -242,16 +250,16 @@ $ cola usage
 
 ## JSON Output
 
-All commands support `--json` flag for scripting and piping to other tools:
+Data commands support `--json` for scripting. These recipes process one page. Without explicit dates the COLA API defaults to the last 365 days. Totals/page counts may be null; continue with `--page` while `pagination.has_more` is true when exporting a bounded query. A text search is not an exact category census:
 
 ```bash
-# Get all bourbon brands
+# Brand names in this page of bourbon text matches
 cola colas list -q "bourbon" --json | jq -r '.data[].brand_name' | sort | uniq
 
-# Count COLAs by product type
+# Count returned-page records by product type
 cola colas list --json | jq '.data | group_by(.product_type) | map({type: .[0].product_type, count: length})'
 
-# Export permittees to CSV
+# Export this page of permittees to CSV
 cola permittees list --state KY --json | jq -r '.data[] | [.permit_number, .company_name, .company_state] | @csv'
 ```
 
@@ -288,10 +296,12 @@ uv run isort .
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+MIT License covers this CLI; see [LICENSE](LICENSE). Data and label artwork have separate rights and terms.
 
 ## Links
 
 - [COLA Cloud Website](https://colacloud.us)
 - [API Documentation](https://docs.colacloud.us/api-reference)
 - [GitHub Repository](https://github.com/cola-cloud-us/colacloud-cli)
+
+Public support: help@colacloud.us

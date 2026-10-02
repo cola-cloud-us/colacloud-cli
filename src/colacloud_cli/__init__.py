@@ -1,3 +1,3 @@
 """COLA Cloud CLI - Command-line interface for the COLA Cloud API."""
 
-__version__ = "0.3.2"
+__version__ = "0.3.6"
