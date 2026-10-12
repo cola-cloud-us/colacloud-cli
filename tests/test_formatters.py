@@ -37,3 +37,15 @@ def test_format_pagination_handles_unknown_total_at_end():
     )
 
     assert "Showing page 2 (end of results)" in output
+
+
+def test_trade_name_is_displayed_as_literal_source_text():
+    from colacloud_cli.formatters import format_cola_detail
+
+    console = Console(record=True, width=120)
+    format_cola_detail(
+        {"ttb_id": "123", "applicant_trade_name": "[bold]Wine & Co[/bold]"}, console
+    )
+    output = console.export_text()
+    assert "Trade name used on label" in output
+    assert "[bold]Wine & Co[/bold]" in output
