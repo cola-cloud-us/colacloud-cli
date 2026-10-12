@@ -305,3 +305,12 @@ MIT License covers this CLI; see [LICENSE](LICENSE). Data and label artwork have
 - [GitHub Repository](https://github.com/cola-cloud-us/colacloud-cli)
 
 Public support: help@colacloud.us
+
+### Applicant trade names
+
+`cola colas get <ttb_id>` displays **Trade name used on label** when available.
+The JSON output of `colas get` and `colas list` includes `applicant_trade_name`.
+This is the applicant DBA/trade name explicitly marked “Used on label” in the
+captured TTB form, separate from the brand and legal company. Null means no
+unambiguous marked value was captured. Select cohorts with `--permit-number`,
+`--date-from` and `--date-to`; paginate list results using `--page`.

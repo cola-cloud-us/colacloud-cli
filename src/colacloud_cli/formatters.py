@@ -184,6 +184,10 @@ def format_cola_detail(cola: dict[str, Any], console: Console) -> None:
     permit_table.add_column("Field", style="dim")
     permit_table.add_column("Value")
     permit_table.add_row("Permit Number", cola.get("permit_number", ""))
+    if cola.get("applicant_trade_name"):
+        permit_table.add_row(
+            "Trade name used on label", Text(cola["applicant_trade_name"])
+        )
     permit_table.add_row("Application Type", cola.get("application_type", ""))
     console.print(permit_table)
 
