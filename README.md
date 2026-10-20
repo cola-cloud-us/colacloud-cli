@@ -314,3 +314,9 @@ This is the applicant DBA/trade name explicitly marked “Used on label” in th
 captured TTB form, separate from the brand and legal company. Null means no
 unambiguous marked value was captured. Select cohorts with `--permit-number`,
 `--date-from` and `--date-to`; paginate list results using `--page`.
+
+## Certificate trust security update
+
+This release requires `certifi>=2026.10.19` to remove trust paths affected by the
+October 2026 eMudhra CA compromise. Upgrade this package and `certifi` in existing
+environments. Explicit custom CA bundles remain the caller's responsibility.
